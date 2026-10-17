@@ -8,3 +8,9 @@ body {
   background-color: #faf8f5;
   color: #1e293b;
 }
+
+/* Specific license badge hide without hiding any app containers */
+body > a[href*="primefaces"],
+body > div:last-child[style*="fixed"]:has(a) {
+  display: none !important;
+}

@@ -19,6 +19,16 @@ const router = createRouter({
       name: 'dashboard',
       component: () => import('../views/DashboardView.vue'),
     },
+    {
+      path: '/erp/shed-operations',
+      name: 'shed-operations',
+      component: () => import('../views/ShedOperationsView.vue'),
+    },
+    {
+      path: '/erp/procurement',
+      name: 'procurement',
+      component: () => import('../views/ProcurementView.vue'),
+    }
   ],
 });
 

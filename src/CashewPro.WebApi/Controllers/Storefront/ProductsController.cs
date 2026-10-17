@@ -19,62 +19,77 @@ public class ProductsController : ControllerBase
     /// Fetches all active cashew grades for the customer storefront showcase.
     /// </summary>
     [HttpGet("grades")]
-    public async Task<IActionResult> GetActiveGrades(CancellationToken cancellationToken)
+    public async Task<IActionResult> GetActiveGrades(CancellationToken cancellationToken = default)
     {
-        var grades = await _context.ProductGrades
-            .AsNoTracking()
-            .Where(g => g.IsActive)
-            .OrderBy(g => g.CurrentRetailPricePerKg)
-            .Select(g => new
-            {
-                g.Id,
-                g.GradeCode,
-                g.GradeName,
-                g.GradeCategory,
-                g.StandardDescription,
-                g.CurrentRetailPricePerKg,
-                g.CurrentWholesalePricePerKg,
-                g.MinimumWholesaleQtyKg,
-                g.ImageUrl
-            })
-            .ToListAsync(cancellationToken);
-
-        return Ok(new
+        try
         {
-            Success = true,
-            Count = grades.Count,
-            Data = grades
-        });
+            var grades = await _context.ProductGrades
+                .AsNoTracking()
+                .Where(g => g.IsActive)
+                .OrderBy(g => g.CurrentRetailPricePerKg)
+                .Select(g => new
+                {
+                    g.Id,
+                    g.GradeCode,
+                    g.GradeName,
+                    g.GradeCategory,
+                    g.StandardDescription,
+                    g.CurrentRetailPricePerKg,
+                    g.CurrentWholesalePricePerKg,
+                    g.MinimumWholesaleQtyKg,
+                    g.ImageUrl
+                })
+                .ToListAsync(cancellationToken);
+
+            return Ok(new
+            {
+                Success = true,
+                Count = grades.Count,
+                Data = grades
+            });
+        }
+        catch (OperationCanceledException)
+        {
+            // Browser connection aborted/reloaded - ignore cleanly
+            return StatusCode(499); // Client Closed Request
+        }
     }
 
     /// <summary>
     /// Fetches live market prices for the storefront top ticker ribbon.
     /// </summary>
     [HttpGet("live-ticker")]
-    public async Task<IActionResult> GetLiveMarketTicker(CancellationToken cancellationToken)
+    public async Task<IActionResult> GetLiveMarketTicker(CancellationToken cancellationToken = default)
     {
-        var ticker = await _context.DailyMarketPrices
-            .AsNoTracking()
-            .Include(p => p.Grade)
-            .OrderByDescending(p => p.PriceDate)
-            .Take(10)
-            .Select(p => new
-            {
-                p.Id,
-                GradeCode = p.Grade.GradeCode,
-                GradeName = p.Grade.GradeName,
-                p.MandiMarketName,
-                p.PricePerKg,
-                p.PriceTrend,
-                p.PriceDate
-            })
-            .ToListAsync(cancellationToken);
-
-        return Ok(new
+        try
         {
-            Success = true,
-            Count = ticker.Count,
-            Data = ticker
-        });
+            var ticker = await _context.DailyMarketPrices
+                .AsNoTracking()
+                .Include(p => p.Grade)
+                .OrderByDescending(p => p.PriceDate)
+                .Take(10)
+                .Select(p => new
+                {
+                    p.Id,
+                    GradeCode = p.Grade.GradeCode,
+                    GradeName = p.Grade.GradeName,
+                    p.MandiMarketName,
+                    p.PricePerKg,
+                    p.PriceTrend,
+                    p.PriceDate
+                })
+                .ToListAsync(cancellationToken);
+
+            return Ok(new
+            {
+                Success = true,
+                Count = ticker.Count,
+                Data = ticker
+            });
+        }
+        catch (OperationCanceledException)
+        {
+            return StatusCode(499);
+        }
     }
 }
