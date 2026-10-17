@@ -1,0 +1,18 @@
+## Visual Studio / .NET
+.vs/
+**/bin/
+**/obj/
+*.user
+*.suo
+appsettings.Development.json
+
+## Node / Frontend
+**/node_modules/
+**/dist/
+.npm
+*.local
+
+## OS Files
+Thumbs.db
+Desktop.ini
+.DS_Store

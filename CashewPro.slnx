@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/CashewPro.Application/CashewPro.Application.csproj" />
+    <Project Path="src/CashewPro.Domain/CashewPro.Domain.csproj" />
+    <Project Path="src/CashewPro.Infrastructure/CashewPro.Infrastructure.csproj" />
+    <Project Path="src/CashewPro.WebApi/CashewPro.WebApi.csproj" />
+  </Folder>
+</Solution>
