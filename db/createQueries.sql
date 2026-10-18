@@ -1,3 +1,5 @@
+USE CashewPro_DB;
+
 -- 1. Roles (Director, AsstDirector, Accountant, ShedSupervisor, SalesExecutive, Customer)
 CREATE TABLE Roles (
     Id INT IDENTITY(1,1) PRIMARY KEY, -- In PostgreSQL use: SERIAL PRIMARY KEY

@@ -48,3 +48,18 @@ VALUES
 ('LAB-103', 1, N'పి. సరస్వతి (P. Saraswathi)', '789456123013', '9848012347', 'te', 26.00, 0.00, 1, '2026-02-01'),
 ('LAB-104', 1, N'బి. రాజేశ్వరి (B. Rajeshwari)', '789456123014', '9848012348', 'te', 26.00, 0.00, 1, '2026-02-10');
 GO
+
+IF NOT EXISTS (SELECT 1 FROM FinishedStock)
+BEGIN
+    INSERT INTO FinishedStock (GradeId, PackageType, TotalQuantityCount, TotalWeightInKg, LastAuditedAt)
+    VALUES 
+    (1, '10KG_TIN', 45, 450.000, CURRENT_TIMESTAMP), -- W-180
+    (2, '10KG_TIN', 60, 600.000, CURRENT_TIMESTAMP), -- W-210
+    (3, '10KG_TIN', 110, 1100.000, CURRENT_TIMESTAMP), -- W-240
+    (4, '10KG_TIN', 140, 1400.000, CURRENT_TIMESTAMP), -- W-320
+    (5, '10KG_TIN', 80, 800.000, CURRENT_TIMESTAMP),   -- JH (Splits)
+    (6, '10KG_TIN', 55, 550.000, CURRENT_TIMESTAMP);   -- LWP (Broken)
+END
+GO
+
+

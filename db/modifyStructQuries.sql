@@ -79,3 +79,138 @@ BEGIN
     SET IDENTITY_INSERT BoilingBatches OFF;
 END
 GO
+
+-- 1. Add CreatedAt & UpdatedAt to FinishedStock table
+IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID('FinishedStock') AND name = 'CreatedAt')
+BEGIN
+    ALTER TABLE FinishedStock ADD CreatedAt DATETIME2 NOT NULL DEFAULT CURRENT_TIMESTAMP;
+END
+GO
+
+IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID('FinishedStock') AND name = 'UpdatedAt')
+BEGIN
+    ALTER TABLE FinishedStock ADD UpdatedAt DATETIME2 NULL;
+END
+GO
+
+IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID('Orders') AND name = 'CreatedAt')
+BEGIN
+    ALTER TABLE Orders ADD CreatedAt DATETIME2 NOT NULL DEFAULT CURRENT_TIMESTAMP;
+END
+GO
+
+IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID('Orders') AND name = 'UpdatedAt')
+BEGIN
+    ALTER TABLE Orders ADD UpdatedAt DATETIME2 NULL;
+END
+GO
+
+IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID('EwayBills') AND name = 'CreatedAt')
+BEGIN
+    ALTER TABLE EwayBills ADD CreatedAt DATETIME2 NOT NULL DEFAULT CURRENT_TIMESTAMP;
+END
+GO
+
+IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID('EwayBills') AND name = 'UpdatedAt')
+BEGIN
+    ALTER TABLE EwayBills ADD UpdatedAt DATETIME2 NULL;
+END
+GO
+
+IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID('OrderItems') AND name = 'CreatedAt')
+BEGIN
+    ALTER TABLE OrderItems ADD CreatedAt DATETIME2 NOT NULL DEFAULT CURRENT_TIMESTAMP;
+END
+GO
+
+IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID('OrderItems') AND name = 'UpdatedAt')
+BEGIN
+    ALTER TABLE OrderItems ADD UpdatedAt DATETIME2 NULL;
+END
+GO
+
+-- 1. Ensure UpdatedAt exists on Customers table
+IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID('Customers') AND name = 'UpdatedAt')
+BEGIN
+    ALTER TABLE Customers ADD UpdatedAt DATETIME2 NULL;
+END
+GO
+
+-- 2. Ensure CreatedAt exists with default
+IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID('Customers') AND name = 'CreatedAt')
+BEGIN
+    ALTER TABLE Customers ADD CreatedAt DATETIME2 NOT NULL DEFAULT CURRENT_TIMESTAMP;
+END
+GO
+
+-- 3. Ensure columns allow safe lengths
+ALTER TABLE Customers ALTER COLUMN PostalCode VARCHAR(30) NULL;
+ALTER TABLE Customers ALTER COLUMN City NVARCHAR(150) NULL;
+ALTER TABLE Customers ALTER COLUMN BillingAddress NVARCHAR(500) NULL;
+ALTER TABLE Customers ALTER COLUMN ShippingAddress NVARCHAR(500) NULL;
+GO
+
+
+-- 1. Labours table lo WorkType mariyu WageBasis column add cheyali
+IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID('Labours') AND name = 'WorkType')
+BEGIN
+    ALTER TABLE Labours ADD WorkType VARCHAR(50) NOT NULL DEFAULT 'CUTTING';
+END
+GO
+
+IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID('Labours') AND name = 'WageBasis')
+BEGIN
+    ALTER TABLE Labours ADD WageBasis VARCHAR(20) NOT NULL DEFAULT 'PER_KG'; -- 'PER_KG', 'PER_DAY'
+END
+GO
+
+-- 2. DailyWorkEntries (Cutting kakunda Peeling, Boiling, Packing, Driver work logging kosam)
+IF NOT EXISTS (SELECT 1 FROM sys.tables WHERE name = 'DailyOtherWorkEntries')
+BEGIN
+    CREATE TABLE DailyOtherWorkEntries (
+        Id BIGINT IDENTITY(1,1) PRIMARY KEY,
+        LabourId BIGINT NOT NULL FOREIGN KEY REFERENCES Labours(Id),
+        ShedId INT NOT NULL FOREIGN KEY REFERENCES Sheds(Id),
+        WorkType VARCHAR(50) NOT NULL, -- 'PEELING', 'BOILING', 'PACKING', 'LOGISTICS'
+        EntryDate DATE NOT NULL,
+        QuantityWorked DECIMAL(12, 3) NOT NULL, -- If Per_KG: kgs; If Per_Day: 1.0 or 0.5 (half day)
+        UnitRate DECIMAL(10, 2) NOT NULL,
+        TotalEarnings DECIMAL(14, 2) NOT NULL,
+        Notes NVARCHAR(250) NULL,
+        EnteredByUserId BIGINT NOT NULL FOREIGN KEY REFERENCES Users(Id),
+        CreatedAt DATETIME2 NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        UpdatedAt DATETIME2 NULL
+    );
+END
+GO
+
+
+
+-- 1. Ensure LabourPayments has CreatedAt & UpdatedAt
+IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID('LabourPayments') AND name = 'CreatedAt')
+BEGIN
+    ALTER TABLE LabourPayments ADD CreatedAt DATETIME2 NOT NULL DEFAULT CURRENT_TIMESTAMP;
+END
+GO
+
+IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID('LabourPayments') AND name = 'UpdatedAt')
+BEGIN
+    ALTER TABLE LabourPayments ADD UpdatedAt DATETIME2 NULL;
+END
+GO
+
+-- 2. Alter PaymentDate to DATETIME2 to accept UtcNow without conversion issues
+ALTER TABLE LabourPayments ALTER COLUMN PaymentDate DATETIME2 NOT NULL;
+ALTER TABLE LabourPayments ALTER COLUMN TransactionRefNumber VARCHAR(150) NULL;
+ALTER TABLE LabourPayments ALTER COLUMN Notes NVARCHAR(500) NULL;
+GO
+
+-- 3. Verify Users table has at least Id = 1 (Fallback Admin)
+IF NOT EXISTS (SELECT 1 FROM Users WHERE Id = 1)
+BEGIN
+    SET IDENTITY_INSERT Users ON;
+    INSERT INTO Users (Id, RoleId, FullName, PhoneNumber, PasswordHash, PreferredLanguage, IsActive)
+    VALUES (1, 1, 'System Director', '9876543210', 'admin@123', 'te', 1);
+    SET IDENTITY_INSERT Users OFF;
+END
+GO

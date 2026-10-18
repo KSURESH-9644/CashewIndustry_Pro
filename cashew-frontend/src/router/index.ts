@@ -28,6 +28,26 @@ const router = createRouter({
       path: '/erp/procurement',
       name: 'procurement',
       component: () => import('../views/ProcurementView.vue'),
+    },
+    {
+      path: '/erp/grading-stock',
+      name: 'grading-stock',
+      component: () => import('../views/GradingStockView.vue'),
+    },
+    {
+      path: '/erp/billing',
+      name: 'billing',
+      component: () => import('../views/BillingView.vue'),
+    },
+    {
+      path: '/erp/analytics',
+      name: 'executive-analytics',
+      component: () => import('../views/ExecutiveAnalyticsView.vue'),
+    },
+    {
+      path: '/erp/shed-logistics',
+      name: 'shed-logistics',
+      component: () => import('../views/ShedLogisticsView.vue'),
     }
   ],
 });

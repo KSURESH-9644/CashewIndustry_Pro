@@ -12,10 +12,14 @@ public class Labour : BaseEntity
     public string? AadhaarNumber { get; set; }
     public string MobileNumber { get; set; } = string.Empty;
     public string PreferredLanguage { get; set; } = "te";
-    public decimal PieceRatePerKg { get; set; } = 25.00m;
+
+    public string WorkType { get; set; } = "CUTTING"; // CUTTING, PEELING, GRADING, BOILING, PACKING, LOGISTICS
+    public string WageBasis { get; set; } = "PER_KG";  // PER_KG, PER_DAY
+    public decimal PieceRatePerKg { get; set; } = 26.00m; // Also serves as daily rate if PER_DAY
+
     public decimal CurrentBalanceAmount { get; set; } = 0.00m;
     public bool IsActive { get; set; } = true;
-    public DateTime JoinedDate { get; set; }
+    public DateTime JoinedDate { get; set; } = DateTime.UtcNow;
 
     public ICollection<DailyCuttingEntry> CuttingEntries { get; set; } = new List<DailyCuttingEntry>();
     public ICollection<LabourPayment> Payments { get; set; } = new List<LabourPayment>();
